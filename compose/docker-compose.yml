@@ -1,0 +1,17 @@
+#
+# launch a local build image 
+# you need to build and tag
+#
+# docker build -f Dockerfile -t php8-test .
+
+version: '3'
+
+services:
+  app:
+    image: php8-test
+    container_name: php8-test-falcon
+    network_mode: "bridge"
+    volumes:
+      - ./:/var/www/html
+    ports:
+      - "8180:80"
