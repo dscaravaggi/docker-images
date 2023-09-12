@@ -10,7 +10,7 @@
 ): resource|false
 */
 // Connects to the XE service (i.e. database) on the "localhost" machine
-$conn = oci_connect('riordino', 'riordino', '192.168.0.36/ora18c');
+$conn = oci_connect('riordino', '******', '192.168.0.258/ora18c');
 if (!$conn) {
     $e = oci_error();
     trigger_error(htmlentities($e['message'], ENT_QUOTES), E_USER_ERROR);

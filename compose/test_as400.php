@@ -10,7 +10,7 @@ try {
 	
    $var1 = 'a';
    $var1 .= 'b';
-  $conn = new PDO("odbc:DRIVER={IBM i Access ODBC Driver 64-bit};SYSTEM=192.168.0.254;DATABASE=STORETZD;UID=store;PWD=tosano");
+  $conn = new PDO("odbc:DRIVER={IBM i Access ODBC Driver 64-bit};SYSTEM=192.168.0.258;DATABASE=STORE***;UID=****;PWD=****");
   // set the PDO error mode to exception
   $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
   $sql = "SELECT FIXD,CACE FROM STORETZD.ARTPES0F LIMIT 5";
