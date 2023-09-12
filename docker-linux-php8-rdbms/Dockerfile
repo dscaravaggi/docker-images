@@ -93,9 +93,13 @@ RUN dpkg -i /tmp/ibm-iaccess-1.1.0.27-1.0.amd64.deb && \
     echo "Description=SAP SQL Anywhere 17 ODBC Driver" >> /tmp/sqlany_odbc.template && \
     echo "Driver=/opt/sqlanywhere17/lib64/libdbodbc17_r.so" >> /tmp/sqlany_odbc.template && \
     echo "Setup=/opt/sqlanywhere17/lib64/libdbodbc17_r.so" >> /tmp/sqlany_odbc.template && \
-    odbcinst -i -d -f  /tmp/sqlany_odbc.template
+    odbcinst -i -d -f  /tmp/sqlany_odbc.template 
 
+ENV NODE_PATH=/opt/sqlanywhere17/node
+ENV SQLANY17=/opt/sqlanywhere17
+ENV ODBCINI=/etc/odbc.ini
 ENV TZ=Europe/Rome
+ENV PATH="/opt/sqlanywhere17/bin64:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 
 EXPOSE 80
 
