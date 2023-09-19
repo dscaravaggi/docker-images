@@ -87,13 +87,20 @@ RUN echo /usr/lib/oracle/21.1/client64/lib > /etc/ld.so.conf.d/oracle.conf && \
     php -i | grep pdo  && \    
     mkdir -p /var/www/
 
+
+#
+# require msodbc for use sqlserv extension use prod/11 because 12 bookworm is not present
+#
+
 RUN dpkg -i /tmp/ibm-iaccess-1.1.0.27-1.0.amd64.deb && \
     /bin/rm -f /tmp/ibm-iaccess-1.1.0.27-1.0.amd64.deb && \
     echo "[SQL Anywhere 17]" > /tmp/sqlany_odbc.template && \
     echo "Description=SAP SQL Anywhere 17 ODBC Driver" >> /tmp/sqlany_odbc.template && \
     echo "Driver=/opt/sqlanywhere17/lib64/libdbodbc17_r.so" >> /tmp/sqlany_odbc.template && \
     echo "Setup=/opt/sqlanywhere17/lib64/libdbodbc17_r.so" >> /tmp/sqlany_odbc.template && \
-    odbcinst -i -d -f  /tmp/sqlany_odbc.template 
+    odbcinst -i -d -f  /tmp/sqlany_odbc.template && \
+    curl --fail -o /tmp/msodbcsql.deb https://packages.microsoft.com/debian/11/prod/pool/main/m/msodbcsql17/msodbcsql17_17.10.4.1-1_amd64.deb && \
+    ACCEPT_EULA=Y  dpkg -i /tmp/msodbcsql.deb ; /bin/rm -f /tmp/*.deb
 
 ENV NODE_PATH=/opt/sqlanywhere17/node
 ENV SQLANY17=/opt/sqlanywhere17
