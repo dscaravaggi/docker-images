@@ -22,5 +22,3 @@ oci_execute($stid);
 while ($row = oci_fetch_array($stid, OCI_ASSOC+OCI_RETURN_NULLS)) {
     print json_encode($row);
 }
-
-?>
