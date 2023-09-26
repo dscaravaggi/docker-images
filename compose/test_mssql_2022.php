@@ -1,4 +1,5 @@
 <?php
+/* Native Microsoft client modern installation encrypted */ 
 /* use correct address and password */
 $serverName = "172.20.12.258";
 $connectionInfo = array( "Database"=>"anagrafica", "UID"=>"php-anag-user", "PWD"=>"*******" );

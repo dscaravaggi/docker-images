@@ -10,6 +10,7 @@ LABEL MAINTAINER="Ufficio IT (ufficio.informatico@supertosano.com)"
 
 LABEL description="Test of installation php apache stack ."
 
+COPY ./assets/ibm-iaccess-1.1.0.27-1.0.amd64.deb /tmp   
 
 RUN export LC_ALL=en_US.UTF-8 ;  apt -y update  && \
     apt-get install -y \
@@ -20,36 +21,38 @@ RUN export LC_ALL=en_US.UTF-8 ;  apt -y update  && \
      libxext6 \
      apt-transport-https && \
     apt-get install -y \
-     unzip \
-     curl \
+     curl \ 
+     freetds-bin \
+     freetds-dev \
      git \
-     php-cli \
+     libaio1 \
+     libodbc1 \
+     odbcinst \
+     odbcinst1debian2 \
      php \
+     php-cli \
      php-curl \
+     php-dev \
      php-gd \
      php-json \
      php-ldap \
      php-mbstring \
      php-mysql \
+     php-odbc \
+     php-pear \
      php-pgsql \
+     php-soap \
      php-sqlite3 \
      php-xml \
      php-xsl \
      php-zip \
-     php-soap \
      ssh \
-     php-pear \
-     php-dev \
-     libaio1 \
-     php-odbc \
+     tdsodbc \
      unixodbc \
-     odbcinst \
-     libodbc1 \
-     odbcinst1debian2 \
-     unixodbc-dev && \
-    pecl -v
-
-RUN mkdir -p /tmp; cd /tmp; mkdir -p ./assets ; \
+     unixodbc-dev \    
+     unzip && \
+    pecl version && \
+    mkdir -p /tmp; cd /tmp; mkdir -p ./assets ; \
     curl --fail --silent -o ./assets/instantclient-basic-linuxx64.zip \
         https://download.oracle.com/otn_software/linux/instantclient/instantclient-basic-linuxx64.zip && \
     curl --fail --silent -o ./assets/instantclient-sdk-linuxx64.zip \
@@ -68,13 +71,10 @@ RUN mkdir -p /tmp; cd /tmp; mkdir -p ./assets ; \
     /bin/rm -rf /tmp/assets ; \
     apt-get clean ; 
 
-COPY ./assets/ibm-iaccess-1.1.0.27-1.0.amd64.deb /tmp   
 
 RUN echo /usr/lib/oracle/21.1/client64/lib > /etc/ld.so.conf.d/oracle.conf && \
     echo /opt/sqlanywhere17/lib64 > /etc/ld.so.conf.d/sqlany.conf && \
     ldconfig && \
-    apt-get install php-sqlite3 && \
-    apt-get -y install php-pgsql && \
     pecl channel-update pecl.php.net && \
     echo instantclient,/usr/lib/oracle/21.1/client64/lib | pecl install oci8 && \
     pecl install sqlsrv-5.11.0 && \
@@ -84,15 +84,7 @@ RUN echo /usr/lib/oracle/21.1/client64/lib > /etc/ld.so.conf.d/oracle.conf && \
     echo "extension=pdo_sqlsrv.so" >> /etc/php/8.2/cli/conf.d/22-rdbms.ini && \
     cp --verbose /etc/php/8.2/cli/conf.d/22-rdbms.ini /etc/php/8.2/apache2/conf.d/22-rdbms.ini && \
     echo "<?php  phpinfo();" > /var/www/html/info.php && \
-    php -i | grep pdo  && \    
-    mkdir -p /var/www/
-
-
-#
-# require msodbc for use sqlserv extension use prod/11 because 12 bookworm is not present
-#
-
-RUN dpkg -i /tmp/ibm-iaccess-1.1.0.27-1.0.amd64.deb && \
+    dpkg -i /tmp/ibm-iaccess-1.1.0.27-1.0.amd64.deb && \
     /bin/rm -f /tmp/ibm-iaccess-1.1.0.27-1.0.amd64.deb && \
     echo "[SQL Anywhere 17]" > /tmp/sqlany_odbc.template && \
     echo "Description=SAP SQL Anywhere 17 ODBC Driver" >> /tmp/sqlany_odbc.template && \
@@ -100,7 +92,18 @@ RUN dpkg -i /tmp/ibm-iaccess-1.1.0.27-1.0.amd64.deb && \
     echo "Setup=/opt/sqlanywhere17/lib64/libdbodbc17_r.so" >> /tmp/sqlany_odbc.template && \
     odbcinst -i -d -f  /tmp/sqlany_odbc.template && \
     curl --fail -o /tmp/msodbcsql.deb https://packages.microsoft.com/debian/11/prod/pool/main/m/msodbcsql17/msodbcsql17_17.10.4.1-1_amd64.deb && \
-    ACCEPT_EULA=Y  dpkg -i /tmp/msodbcsql.deb ; /bin/rm -f /tmp/*.deb
+    ACCEPT_EULA=Y  dpkg -i /tmp/msodbcsql.deb ; /bin/rm --force /tmp/*.deb && \
+    php -i | grep pdo  && \    
+    mkdir -p /var/www/ && \
+    EXPECTED_CHECKSUM="$(php -r 'copy("https://composer.github.io/installer.sig", "php://stdout");')" ; \
+    php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" ; \
+    ACTUAL_CHECKSUM="$(php -r "echo hash_file('sha384', 'composer-setup.php');")" ; \
+    if [ "$EXPECTED_CHECKSUM" != "$ACTUAL_CHECKSUM" ]; then exit 1; fi ; \
+    php composer-setup.php --install-dir=bin --quiet && \
+    ln -s /usr/bin/composer.phar /usr/bin/composer && \
+    php -r "unlink('composer-setup.php');" && \
+    composer -V 
+
 
 ENV NODE_PATH=/opt/sqlanywhere17/node
 ENV SQLANY17=/opt/sqlanywhere17
