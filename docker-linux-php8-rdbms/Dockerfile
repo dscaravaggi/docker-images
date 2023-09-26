@@ -4,11 +4,10 @@
 FROM debian:bookworm-slim
 
 
-LABEL "com.supertosano"="Super Tosano"
-LABEL version="1.0-exp"
-LABEL MAINTAINER="Ufficio IT (ufficio.informatico@supertosano.com)"
-
-LABEL description="Test of installation php apache stack ."
+LABEL "com.supertosano"="Super Tosano" \
+      version="1.0-exp" \
+      MAINTAINER="Ufficio IT (ufficio.informatico@supertosano.com)" \
+      description="Test of installation php apache stack ."
 
 COPY ./assets/ibm-iaccess-1.1.0.27-1.0.amd64.deb /tmp   
 
@@ -104,12 +103,11 @@ RUN echo /usr/lib/oracle/21.1/client64/lib > /etc/ld.so.conf.d/oracle.conf && \
     php -r "unlink('composer-setup.php');" && \
     composer -V 
 
-
-ENV NODE_PATH=/opt/sqlanywhere17/node
-ENV SQLANY17=/opt/sqlanywhere17
-ENV ODBCINI=/etc/odbc.ini
-ENV TZ=Europe/Rome
-ENV PATH="/opt/sqlanywhere17/bin64:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+ENV NODE_PATH=/opt/sqlanywhere17/node \
+    SQLANY17=/opt/sqlanywhere17 \
+    ODBCINI=/etc/odbc.ini \
+    TZ=Europe/Rome \
+    PATH="/opt/sqlanywhere17/bin64:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 
 EXPOSE 80
 
